@@ -56,7 +56,7 @@
             margin-top: 25px;
             border-top: 2px solid #eee;
             padding-top: 20px;
-            white-space: pre-wrap; 
+            white-space: pre-wrap; /* This helps display AI formatting */
         }
     </style>
 </head>
@@ -100,17 +100,16 @@
             resultsDiv.innerHTML = "Searching for relevant innovations...";
 
             // ----------------------------------------------------
-            // ⬇️ YOUR NEW N8N URL IS NOW INSERTED HERE ⬇️
+            // ⬇️ YOUR N8N PRODUCTION URL IS NOW INSERTED ⬇️
             // ----------------------------------------------------
             
-            const n8nWebhookUrl = 'https://raia.app.n8n.cloud/webhook-test/fd99b125-b21a-4cef-8c25-e53622e3f467';
+            const n8nWebhookUrl = 'https://raia.app.n8n.cloud/webhook/fd99b125-b21a-4cef-8c25-e53622e3f467';
             
             // ----------------------------------------------------
-            // ⬆️ YOUR NEW N8N URL IS NOW INSERTED HERE ⬆️
+            // ⬆️ YOUR N8N PRODUCTION URL IS NOW INSERTED ⬆️
             // ----------------------------------------------------
 
             try {
-                // *** I also fixed a typo here: 'n8NWebhookUrl' is now 'n8nWebhookUrl' ***
                 const response = await fetch(n8nWebhookUrl, {
                     method: 'POST',
                     headers: {
@@ -125,10 +124,10 @@
 
                 const data = await response.json();
                 
-                // 'data' is the full JSON from n8n. 
-                // raiaAI's reply might be in 'data.reply' or 'data.answer'
-                // This line will try to find 'data.reply' first.
-                const aiReply = data.reply || JSON.stringify(data, null, 2); 
+                // This is the final logic to get the AI's reply.
+                // It looks for the 'text' field inside the 'response' object
+                // from the /messages API call.
+                const aiReply = data.response.text || JSON.stringify(data, null, 2); 
                 
                 resultsDiv.innerHTML = aiReply;
 
@@ -146,4 +145,3 @@
 
 </body>
 </html>
-
