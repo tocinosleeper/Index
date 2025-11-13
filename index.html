@@ -32,7 +32,7 @@
             width: 100%;
             height: 120px;
             padding: 10px;
-            box-sizing: border-box; /* Important for 100% width */
+            box-sizing: border-box; 
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 1em;
@@ -56,7 +56,7 @@
             margin-top: 25px;
             border-top: 2px solid #eee;
             padding-top: 20px;
-            white-space: pre-wrap; /* This helps display formatting from the AI */
+            white-space: pre-wrap; 
         }
     </style>
 </head>
@@ -68,13 +68,29 @@
 
         <textarea id="ideaInput" placeholder="e.g., 'I want to build a company that uses drones for precision agriculture to reduce pesticide use...'"></textarea>
         
-        <button id="submitButton" onclick="findTech()">Search for Technologies</button>
+        <button id="submitButton">Search for Technologies</button>
 
         <div id="results">
             </div>
     </div>
 
     <script>
+        // --- NEW CODE ---
+        // This waits for the page to be fully loaded before running
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Find the button by its ID
+            const submitButton = document.getElementById('submitButton');
+            
+            // Add a click event listener to the button
+            // When clicked, it will run your 'findTech' function
+            if (submitButton) {
+                submitButton.addEventListener('click', findTech);
+            }
+        });
+        // --- END NEW CODE ---
+
+
+        // This is your original function, unchanged
         async function findTech() {
             const idea = document.getElementById('ideaInput').value;
             const resultsDiv = document.getElementById('results');
@@ -85,7 +101,6 @@
                 return;
             }
 
-            // Disable button and show loading message
             submitButton.disabled = true;
             submitButton.innerText = "Searching...";
             resultsDiv.innerHTML = "Searching for relevant innovations...";
@@ -98,7 +113,6 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    // This sends the user's text to n8n
                     body: JSON.stringify({ idea: idea }) 
                 });
 
@@ -106,17 +120,9 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                // Get the response from n8n (which is the reply from raiaAI)
                 const data = await response.json();
 
-                // ---
-                // STEP 3: CUSTOMIZE THIS PART
-                // ---
-                // 'data' is the full JSON from n8n. raiaAI's reply might be in a field
-                // like 'data.reply' or 'data.answer'. You'll need to test this.
-                // For now, we'll assume the direct response is what we want.
-                
-                // You might need to change this to 'data.reply' or 'data.answer'
+                // You may still need to adjust this line based on raiaAI's response
                 const aiReply = data.reply || JSON.stringify(data, null, 2); 
                 
                 resultsDiv.innerHTML = aiReply;
@@ -125,7 +131,6 @@
                 resultsDiv.innerHTML = "An error occurred while searching. Please try again.";
                 console.error('Error:', error);
             } finally {
-                // Re-enable the button
                 submitButton.disabled = false;
                 submitButton.innerText = "Search for Technologies";
             }
