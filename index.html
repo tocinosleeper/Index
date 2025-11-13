@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UF Innovate | Idea to IP Search</title>
+    
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 2em;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 2em;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        h2 {
+            color: #0021A5; /* UF Blue */
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+        #ideaInput {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            box-sizing: border-box; /* Important for 100% width */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+        #submitButton {
+            padding: 12px 20px;
+            background-color: #FA4616; /* UF Orange */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        #submitButton:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #results {
+            margin-top: 25px;
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+            white-space: pre-wrap; /* This helps display formatting from the AI */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Idea to IP: UF Technology Search</h2>
+        <p>Describe your business idea or the technology you need, and we'll find UF innovations to help you.</p>
+
+        <textarea id="ideaInput" placeholder="e.g., 'I want to build a company that uses drones for precision agriculture to reduce pesticide use...'"></textarea>
+        
+        <button id="submitButton" onclick="findTech()">Search for Technologies</button>
+
+        <div id="results">
+            </div>
+    </div>
+
+    <script>
+        async function findTech() {
+            const idea = document.getElementById('ideaInput').value;
+            const resultsDiv = document.getElementById('results');
+            const submitButton = document.getElementById('submitButton');
+
+            if (!idea) {
+                resultsDiv.innerHTML = "Please enter an idea in the text box.";
+                return;
+            }
+
+            // Disable button and show loading message
+            submitButton.disabled = true;
+            submitButton.innerText = "Searching...";
+            resultsDiv.innerHTML = "Searching for relevant innovations...";
+
+            // const n8nWebhookUrl = 'https://your-n8n-instance.com/webhook/YOUR-UNIQUE-ID';
+            
+            // try {
+                const response = await fetch(n8nWebhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    // This sends the user's text to n8n
+                    body: JSON.stringify({ idea: idea }) 
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Get the response from n8n (which is the reply from raiaAI)
+                const data = await response.json();
+
+                // ---
+                // STEP 3: CUSTOMIZE THIS PART
+                // ---
+                // 'data' is the full JSON from n8n. raiaAI's reply might be in a field
+                // like 'data.reply' or 'data.answer'. You'll need to test this.
+                // For now, we'll assume the direct response is what we want.
+                
+                // You might need to change this to 'data.reply' or 'data.answer'
+                const aiReply = data.reply || JSON.stringify(data, null, 2); 
+                
+                resultsDiv.innerHTML = aiReply;
+
+            } catch (error) {
+                resultsDiv.innerHTML = "An error occurred while searching. Please try again.";
+                console.error('Error:', error);
+            } finally {
+                // Re-enable the button
+                submitButton.disabled = false;
+                submitButton.innerText = "Search for Technologies";
+            }
+        }
+    </script>
+
+</body>
+</html>
