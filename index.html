@@ -55,4 +55,94 @@
         #results {
             margin-top: 25px;
             border-top: 2px solid #eee;
-            padding
+            padding-top: 20px;
+            white-space: pre-wrap; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Idea to IP: UF Technology Search</h2>
+        <p>Describe your business idea or the technology you need, and we'll find UF innovations to help you.</p>
+
+        <textarea id="ideaInput" placeholder="e.g., 'I want to build a company that uses drones for precision agriculture to reduce pesticide use...'"></textarea>
+        
+        <button id="submitButton">Search for Technologies</button>
+
+        <div id="results">
+            </div>
+    </div>
+
+    <script>
+        // This attaches the click event to the button
+        document.addEventListener('DOMContentLoaded', () => {
+            const submitButton = document.getElementById('submitButton');
+            if (submitButton) {
+                submitButton.addEventListener('click', findTech);
+            }
+        });
+
+        // This is the main function that runs on click
+        async function findTech() {
+            const idea = document.getElementById('ideaInput')..value;
+            const resultsDiv = document.getElementById('results');
+            const submitButton = document.getElementById('submitButton');
+
+            if (!idea) {
+                resultsDiv.innerHTML = "Please enter an idea in the text box.";
+                return;
+            }
+
+            // Disable button and show loading message
+            submitButton.disabled = true;
+            submitButton.innerText = "Searching...";
+            resultsDiv.innerHTML = "Searching for relevant innovations...";
+
+            // ----------------------------------------------------
+            // ⬇️ YOUR NEW N8N URL IS NOW INSERTED HERE ⬇️
+            // ----------------------------------------------------
+            
+            const n8nWebhookUrl = 'https://raia.app.n8n.cloud/webhook-test/fd99b125-b21a-4cef-8c25-e53622e3f467';
+            
+            // ----------------------------------------------------
+            // ⬆️ YOUR NEW N8N URL IS NOW INSERTED HERE ⬆️
+            // ----------------------------------------------------
+
+            try {
+                // *** I also fixed a typo here: 'n8NWebhookUrl' is now 'n8nWebhookUrl' ***
+                const response = await fetch(n8nWebhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ idea: idea }) 
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // 'data' is the full JSON from n8n. 
+                // raiaAI's reply might be in 'data.reply' or 'data.answer'
+                // This line will try to find 'data.reply' first.
+                const aiReply = data.reply || JSON.stringify(data, null, 2); 
+                
+                resultsDiv.innerHTML = aiReply;
+
+            } catch (error) {
+                // If there's an error, display it in the results div
+                resultsDiv.innerHTML = `An error occurred: ${error.message}`;
+                console.error('Error:', error);
+            } finally {
+                // Re-enable the button
+                submitButton.disabled = false;
+                submitButton.innerText = "Search for Technologies";
+            }
+        }
+    </script>
+
+</body>
+</html>
